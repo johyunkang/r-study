@@ -1,6 +1,7 @@
 # r-study
 
-공부하는 도서 링크 : https://wikidocs.net/book/4315
+공부하는 도서 링크 : [Must Learning with R](https://wikidocs.net/book/4315)
+
 
 ### 단축키
 | 기능                           | 실행 위치 | 단축키                                  |
