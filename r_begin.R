@@ -55,3 +55,60 @@ df[,1] # 1열 전부
 df[c(1,2,3), -2] # 1,2,3행 중 2열은 빼고 전부 출력
 
 df[seq(1,3), c(-2)]
+
+num_vector = c(1:20)
+str(num_vector)
+
+chr_vector = c("a", "b", "c")
+str(chr_vector)
+
+chr_date = '2020-01-20'
+date_date = as.Date(chr_date, format="%Y-%m-%d")
+str(chr_date)
+str(date_date)
+
+
+chr_date1 = '2020-02-04 23:12:50'
+str(chr_date1)
+
+date_p = as.POSIXct(chr_date1, format="%Y-%m-%d %H:%M:%S")
+str(date_p)
+
+format(date_p, "%A")
+format(date_p, "%S")
+format(date_p, "%Y")
+
+
+x = c(1:10)
+
+x_int = as.integer(x)
+x_num = as.numeric(x)
+x_factor = as.factor(x)
+x_chr = as.character(x)
+str(x_int)
+summary(x_int)
+
+str(x_num)
+summary(x_num)
+
+str(x_factor)
+summary(x_factor)
+
+str(x_chr)
+summary(x_chr)
+
+
+x = c(1:10)
+y = c("str", 'str2', "str3", 'str4')
+
+is.integer(x)
+
+is.numeric(x)
+
+is.factor(x)
+
+is.factor(y)
+
+is.character(y)
+
+
