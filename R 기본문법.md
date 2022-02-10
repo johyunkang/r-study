@@ -179,3 +179,193 @@ print(b)
 3  3  1 2
 ```
 
+### 변수 형태 이해하기
+
+R에서는 데이터의 타입을 다음으로 정리하며, 보통 Strings 라고 부름.
+
+| Strings Type    | 설명                         |
+| --------------- | ---------------------------- |
+| chr (Character) | 문자열 형태                  |
+| int (Integer)   | 숫자                         |
+| num (Numeric)   | 숫자                         |
+| Factor          | 명목형 변수                  |
+| POSIXct         | 시간 변수(년/월/일 시:분:초) |
+| Tseries         | 시계열 변수                  |
+
+Strings에 따라 완전히 다른 분석결과가 나올 수 있기 때문에 문자열 종류 파악이 중요함. 그리고 Strings 에 따라 분석방법론이 정해지게 됨.
+
+- 범주형 : 몇 개의 범주로 나누어진 자료를 의미
+  - 명목형 : 성별, 성공여부, 혈액형 등 단순히 분류된 자료. 학점 이수 여부 (Pass/Fail)
+  - 순서형(Ordinal) : 개개의 값들이 이산적이며 그들 사이에 순서 관계가 존재하는 자료. 학년 (1학년, 2학년)
+- 수치형 : 이산형과 연속형으로 이루어진 자료를 의미
+  - 이산형 (Discrete) : 이산적인 값을 갖는 데이터로 출산 횟수, 안타 횟수 등을 의미
+  - 연속형(Continuous) : 연속적인 값을 갖는 데이터로 신장, 체중 등을 의미. 카운팅이 불가능. 정확히 키가 175, 176 으로 떨어지지 않고 175.333333333 이기도 함.
+
+변수의 척도에 따른 정보량
+
+| 변수 척도         | 예시                     | 정보량 |
+| ----------------- | ------------------------ | ------ |
+| 명목 (Norminal)   | 학점 이수 여부 (P / F)   | O      |
+| 순서 (Ordinal)    | 공식 성적 (A+, A, B+, B) | OO     |
+| 연속 (Continuous) | 백분위 점수 (0 ~ 100)    | OOO    |
+
+- 데이터의 변환
+
+  정보량이 풍부한 연속형의 데이터가 순서, 명목형으로 변환은 가능. 반대 순서는 정보량이 부족해서 변환이 불가능
+
+- 데이터 타입 확인
+
+  str() 명령어를 통해 확인 가능
+
+  > str(벡터, 행렬, 데이터 등 모든 저장값)
+
+```R
+> num_vector = c(1:20)
+> str(num_vector)
+ int [1:20] 1 2 3 4 5 6 7 8 9 10 ...
+
+> chr_vector = c("a", "b", "c")
+> str(chr_vector)
+ chr [1:3] "a" "b" "c"
+```
+
+### 시간(날짜) 형태의 변수 다루기
+
+R에서 시간(날짜) 데이터 다루는 방법 3가지
+
+- as.Date() : '년-월-일' 형태로 다루기
+- as.POSIXct() : '년-월-일 시:분:초' 형태로 다루기
+- lubridate 패키지를 활용하여 날짜 데이터 다루기
+
+#### as.Date() 활용
+
+> as.Date(변수, format="날짜형식")
+
+| FORMAT | EXAMPLE   | FORMAT | EXAMPLE         |
+| ------ | --------- | ------ | --------------- |
+| %a     | 화        | %M     | 23 (분)         |
+| %A     | 화요일    | %p     | AM / PM         |
+| %b     | 1         | %S     | 23 (초)         |
+| %B     | 1월       | %u     | 1-7 (1: 월요일) |
+| %C     | 20세기    | %W     | 0-6 (0:일요일)  |
+| %d     | 09 (날짜) | %y     | 12 (년)         |
+| %H     | 23 (시간) | %Y     | 2012 (년)       |
+| %I     | 11 (시간) | %m     | 01 (월)         |
+
+
+
+```R
+> chr_date = '2020-01-20'
+> date_date = as.Date(chr_date, format="%Y-%m-%d")
+
+> str(chr_date)
+ chr "2020-01-20"
+
+> str(date_date)
+ Date[1:1], format: "2020-01-20"
+```
+
+
+
+#### as.POSIXct() 활용
+
+> as.POSIXct(날짜, format="날짜형식")
+
+```R
+> chr_date1 = '2020-02-04 23:12:50'
+> str(chr_date1)
+ chr "2020-02-04 23:12:50"
+> date_p = as.POSIXct(chr_date1, format="%Y-%m-%d %H:%M:%S")
+> str(date_p)
+ POSIXct[1:1], format: "2020-02-04 23:12:50"
+```
+
+#### format() 활용
+
+> format(날짜 변수, "형식")
+
+```R
+> format(date_p, "%A")
+[1] "화요일"
+
+> format(date_p, "%S")
+[1] "50"
+
+> format(date_p, "%Y")
+[1] "2020"
+```
+
+
+
+### as, is 를 통해 strings 확인 및 변경하기
+
+#### as()
+
+as는 "변수 X를 ~로 취급하겠다." 라는 의미를 가짐.
+
+```R
+> x = c(1:10)
+
+> x_int = as.integer(x)
+> x_num = as.numeric(x)
+> x_factor = as.factor(x)
+> x_chr = as.character(x)
+
+> str(x_int)
+ int [1:10] 1 2 3 4 5 6 7 8 9 10
+
+> summary(x_int)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    3.25    5.50    5.50    7.75   10.00 
+
+> str(x_num)
+ num [1:10] 1 2 3 4 5 6 7 8 9 10
+
+> summary(x_num)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    3.25    5.50    5.50    7.75   10.00 
+
+> str(x_factor)
+ Factor w/ 10 levels "1","2","3","4",..: 1 2 3 4 5 6 7 8 9 10
+
+> summary(x_factor)
+ 1  2  3  4  5  6  7  8  9 10 
+ 1  1  1  1  1  1  1  1  1  1 
+
+> str(x_chr)
+ chr [1:10] "1" "2" "3" "4" "5" "6" "7" "8" "9" "10"
+
+> summary(x_chr)
+   Length     Class      Mode 
+       10 character character 
+
+```
+
+
+
+#### is()
+
+is는 논리문으로써 변수 X가 ~ 인지 판단해라. 라는 의미. str()은 단순히 strings 인지 확인만 하지 결과를 반환하지는 않음.
+
+```R
+> x = c(1:10)
+> y = c("str", 'str2', "str3", 'str4')
+
+> is.integer(x)
+[1] TRUE
+
+> is.numeric(x)
+[1] TRUE
+
+> is.factor(x)
+[1] FALSE
+
+> is.factor(y)
+[1] FALSE
+
+> is.character(y)
+[1] TRUE 
+```
+
+
+
