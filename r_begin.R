@@ -112,3 +112,29 @@ is.factor(y)
 is.character(y)
 
 
+# sample()
+sample_data = sample(1:45, 6, replace=FALSE) # replace=FALSE 비복원추출, TRUE: 복원추출
+print(sample_data)
+
+# set.seed(number) 를 통해 random 값 고정 가능
+set.seed(123)
+s2 = sample(1:45, 6, replace = FALSE)
+print(s2)
+
+a = c(1:5)
+
+# %in% a에 속해 있는지 확인하는 논리문
+if( 7 %in% a){
+  print("true")
+} else{
+  print("false")  
+}
+
+fn_plus = function(x, y){
+  return(x+y)
+}
+
+fn_plus(2,3)
+
+install.packages("ggplot2")
+library(ggplot2)
