@@ -179,6 +179,8 @@ print(b)
 3  3  1 2
 ```
 
+
+
 ### 변수 형태 이해하기
 
 R에서는 데이터의 타입을 다음으로 정리하며, 보통 Strings 라고 부름.
@@ -255,14 +257,7 @@ R에서 시간(날짜) 데이터 다루는 방법 3가지
 
 
 ```R
-> chr_date = '2020-01-20'
-> date_date = as.Date(chr_date, format="%Y-%m-%d")
-
-> str(chr_date)
- chr "2020-01-20"
-
-> str(date_date)
- Date[1:1], format: "2020-01-20"
+> chr_date = '2020-01-20'> date_date = as.Date(chr_date, format="%Y-%m-%d")> str(chr_date) chr "2020-01-20"> str(date_date) Date[1:1], format: "2020-01-20"
 ```
 
 
@@ -348,24 +343,90 @@ as는 "변수 X를 ~로 취급하겠다." 라는 의미를 가짐.
 is는 논리문으로써 변수 X가 ~ 인지 판단해라. 라는 의미. str()은 단순히 strings 인지 확인만 하지 결과를 반환하지는 않음.
 
 ```R
-> x = c(1:10)
-> y = c("str", 'str2', "str3", 'str4')
+ x = c(1:10)
+ y = c("str", 'str2', "str3", 'str4')
 
-> is.integer(x)
+ is.integer(x)
 [1] TRUE
 
-> is.numeric(x)
+ is.numeric(x)
 [1] TRUE
 
-> is.factor(x)
+ is.factor(x)
 [1] FALSE
 
-> is.factor(y)
+ is.factor(y)
 [1] FALSE
 
-> is.character(y)
+ is.character(y)
 [1] TRUE 
 ```
 
 
+
+### sample()을 통한 데이터 무작위 추출
+
+데이터가 방대한 경우 무작위 추출을 통해 데이터의 특성은 살리면서 테스트는 빠르게 실행이 가능함. 파라미터 중 **replace=FALSE**의 의미는 **비복원 추출**을 하겠다는 의미. (TRUE: 복원 추출, FALSE: 비복원 추출)
+
+> sample(데이터 추출 범위, 추출 갯수, replace=TRUE / FALSE) 
+
+```R
+ sample_data = sample(1:45, 6, replace=FALSE) # replace=FALSE (비복원추출, TRUE: 복원추출)
+ print(sample_data)
+[1] 17 30 45 38  1 26
+```
+
+무작위 결과 값을 고정 시켜야 할때는 **set.seed()**를 이용하여 고정 가능
+
+```R
+ # set.seed(number) 를 통해 random 값 고정 가능
+ set.seed(123)
+ s2 = sample(1:45, 6, replace = FALSE)
+ print(s2)
+[1] 31 15 14  3 37 43
+```
+
+
+
+### if 문 활용하기
+
+```R
+ a = c(1:5)
+ # %in% a에 속해 있는지 확인하는 논리문
+ if( 3 %in% a){
+   print("true")
+ } else{
+   print("false")  
+ }
+[1] "true"
+```
+
+
+
+###  function()을 통해 사용자 함수 만들기
+
+입력된 두 수를 합하는 함수
+
+```R
+fn_plus = function(x, y){
+  return(x+y)
+}
+
+fn_plus(2,3)
+```
+
+```R
+[1] 5
+```
+
+
+
+### 패키지 설치방법
+
+추가로 필요한 함수는 패키지를 설치하여 사용해야 함. 패키지 설치 후 사용을 위해서는 라이브러리 선언을 해야 함
+
+```R
+install.packages("ggplot2")
+library(ggplot2)
+```
 
