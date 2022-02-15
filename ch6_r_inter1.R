@@ -1,0 +1,88 @@
+### ch6. 중급문법 1단계
+
+# Kaggle data set url : https://www.kaggle.com/colara/human-resource
+
+
+##### data 설명 #####
+# satisfaction_level : 직무 만족도
+# last_evaluation : 마지막 평가점수
+# number_project : 진행 프로젝트 수
+# average_monthly_hours : 월평균 근무시간
+# time_spend_company : 근속년수
+# work_accident : 사건사고 여부(0: 없음, 1: 있음, 명목형)
+# left : 이직 여부(0: 잔류, 1: 이직, 명목형)
+# promotion_last_5years: 최근 5년간 승진여부(0: 승진 x, 1: 승진, 명목형)
+# sales : 부서
+# salary : 임금 수준
+###################################
+
+
+# file read
+hr = read.csv('C:/R/data/HR_comma_sep.csv')
+
+# apply () 함수 설명
+# apply(데이터, 계산기준(1:행, 2:열), 함수)
+
+# apply와 for 문의 계산 차이
+# hr 데이터셋의 1,2 열의 평균 구하기
+# for
+for(i in 1:2) {
+  print(paste(colnames(hr)[i], " : ", mean(hr[, i])))
+}
+
+# apply
+apply(hr[, 1:2], 2, mean) # apply(data, 1(행) or 2(열), 함수)
+
+# colMeans
+colMeans(hr[, 1:2])
+
+# apply 를 이용하여 표준편차 구하기
+apply(hr[, 1:2], 2, sd)
+
+
+# 각 변수의 표준편차 구하는 방법
+D = c(1, 2, 3, 4, NA)
+E = c(1,2,3,4,5)
+
+df = data.frame(D = D, E = E)
+
+# NA 가 포함된 데이터의 표준편차 구하기
+apply(df, 2, sd) # apply(df, 2, sd, na.rm=TRUE) na.rm=TRUE 옵션을 주면 NA 제거 후 계산
+
+colSd = function(x) {
+  y = sd(x, na.rm=TRUE)
+  return(y)
+}
+
+apply(df, 2, colSd)
+
+# tapply
+tapply(hr$satisfaction_level, hr$left, mean)
+
+# lapply: 한 번에 여러 변수들에 동일한 조건을 주고 싶은 경우 
+df$D2 = gsub(1, "a", df$D) # gsub(1, "a", 변수) 변수의 값이  1이면 a로 변경 
+df$E2 = gsub(1, "a", df$E)
+head(df)
+
+# 위의 변경 작업을 한 번에 일괄 적용 lapply를 이용하여.
+df2 = df[, 1:2]
+df3 = lapply(df2, function(x) gsub(1, "a", x))
+df3 = as.data.frame(df3)
+head(df3)
+
+
+## dplyr 패키지 소개
+head(rowMeans(hr[, 1:2]))
+
+# 위 head(rowMeans(hr[, 1:2])) 를 dplyr 을 이용하여 아래 표현
+hr[, 1:2] %>% 
+  rowMeans() %>% 
+  head()
+# 위 dplyr 연산을 이용하면 순서대로 직관적으로 표현됨
+
+# 예시 한 번 더
+apply(hr[, 1:5], 2, mean)
+
+hr[, 1:5] %>% 
+  colMeans()
+
