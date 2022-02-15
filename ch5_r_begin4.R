@@ -142,3 +142,99 @@ print(imdb$Genre2)
 # 3. 문자 처리(특수문자 제거, 조사 제거, 숫자 제거 등)
 # 4. 문자열 변수 생성
 
+
+# 1.코퍼스 생성
+#install.packages("tm") # tm 패키지 설치 필요
+library(tm)  
+
+corpus =Corpus(VectorSource(imdb$Genre2)) # 코퍼스 생성
+corpus_tm = tm_map(corpus, removePunctuation) # 특수문자 제거
+corpus_tm = tm_map(corpus_tm, removeNumbers) # 숫자 제거거
+corpus_tm = tm_map(corpus_tm, tolower) # 알파벳 소문자로 변경
+# 코퍼스는 말뭉치라는 의미로, 텍스트 마이닝을 진행하기 전 데이터를 정리하는
+# 과정으로 생각하면 됨
+
+# 2. 문서행렬 생성
+# 문서행렬 만드는 이유 2가지
+# - 특정 단어를 변수로 만들어, 분석에 사용하려는 목적
+# - 특정 단어가 포함되어 있는 데이터만 따로 추출하거나 특정단어가 많이 등장하였을
+# 때, 이것이 다른 무언가와 상관성이 있는지 분석하기 위한 목적
+tdm = DocumentTermMatrix(corpus_tm) # 문서행렬 생성
+inspect(tdm)
+tdm = as.data.frame(as.matrix(tdm)) # 문서행렬을 DF 형태로 만들기
+head(tdm, 3)
+
+# 3. 기존 데이터와 결합하기
+# cbind (Column Bind) : 두 데이터가 같은 행을 가지고 순서도 같을 때 사용
+#  (eg. 행이 동일하고, 순서도 같을 때 옆으로 변수 합치기)
+# rbind (Row Bind) : 합쳐야 할 두 데이터가 같은 열을 가지고, 순서도 같은데 행을 합칠 때 사용 
+#  (eg. 열이 동일하고, 순서도 같을 때 아래로(obs) 합치기)
+# merge : 열과 행이 다른 두 데이터 셋을 하나의 기준을 잡고 합치고자 할 때 사용
+
+imdb_genre = cbind(imdb, tdm) 
+
+
+# 1 단계: stopwords를 이용한 단어 제거
+corp =Corpus(VectorSource(imdb$Description)) # 코퍼스 생성
+corp_tm = tm_map(corp, stripWhitespace) # 공백제거
+corp_tm = tm_map(corp_tm, removePunctuation) # 특수문자 제거
+corp_tm = tm_map(corp_tm, removeNumbers) # 숫자 제거거
+corp_tm = tm_map(corp_tm, tolower) # 알파벳 소문자로 변경
+
+dtm = DocumentTermMatrix(corp_tm)
+inspect(dtm)
+
+# and, for, from 등의 단어들은 자주 쓰이지만 의미를 전달하는 단어는 아님.
+# 그러므로 텍스트 마이닝시에는 제거가 필요.
+corp_tm = tm_map(corp_tm, removeWords, c(stopwords("english"), "my", "custom", "words"))
+# stopwords를 사용하면 and, his 같은 단어 등을 모두 삭제 가능
+# 추가 삭제를 희망하는 단어는 c() 명령어 안에 넣어주면 삭제 가능
+# 현재는 my, custom, words 3가지 단어를 추가로 삭제시킴
+
+# 2단계: 중복등장 단어 처리 결정
+# 1안: 특정 단어가 문장에 포함되어 있냐 없냐로 표시 > 0, 1로 코딩(0:비포함, 1:포함)
+convert_count1 = function(x) {
+  y <- ifelse(x > 0, 1, 0)
+  y = as.numeric(y)
+  y
+}
+
+# 2안: 특정 단어가 문장에서 몇번 등장했냐를 표시 > 등장 빈도로 코딩
+convert_count2 = function(x) {
+  y <- ifelse(x > 0, x, 0)
+  y = as.numeric(y)
+  y
+}
+
+# 사용자 함 수 적용
+# 매트릭스 형태인 TDM에 convert_count 커스텀 함수를 적용하여 값을 배출
+desc_imdb = apply(dtm, MARGIN = 2, convert_count2)
+desc_imdb = as.data.frame(desc_imdb)
+
+# 3단계 : 문자열 데이터 시각화
+tdm = TermDocumentMatrix(corp_tm)
+
+# 워드 클라우드 생성
+m = as.matrix(tdm)
+v = sort(rowSums(m), decreasing = TRUE) # 빈도수를 기준으로 내림차순 정렬
+d = data.frame(word = names(v), freq=v)
+
+# install.packages("SnowballC")
+# install.packages("wordcloud")
+# install.packages("RColorBrewer")
+
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+
+# min.freq -> 최소 5번 이상 쓰인 단어만 띄우기
+# max.words -> 최대 200개만 띄우기
+# random.order -> 단어 위치 랜덤 여부
+wordcloud(words = d$word, freq = d$freq, min.freq = 5, max.words = 200
+          , random.order = FALSE, colors = brewer.pal(8, "Dark2"))
+
+# 단어 빈도 그래프 그릭
+ggplot(d[1:10, ]) + 
+  geom_bar(aes(x = reorder(word, freq), y=freq), stat = 'identity') +
+  coord_flip() + xlab("word") + ylab("freq") +
+  theme_bw()
