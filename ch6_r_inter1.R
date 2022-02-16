@@ -86,3 +86,93 @@ apply(hr[, 1:5], 2, mean)
 hr[, 1:5] %>% 
   colMeans()
 
+
+
+# 데이터 집계 내기
+# summarise
+summarise(hr, MEAN = mean(satisfaction_level),
+              N = length(satisfaction_level))
+
+hr %>% 
+  summarise(MEAN = mean(satisfaction_level),
+            N = length(satisfaction_level))
+
+# subset 후 ddply 적용했을 때 %>%  활용법
+# install.packages("plyr")
+library(plyr)
+
+# hr 의 left 컬럼 값이 1인 행의 sales 별  평균과 개수 구하기
+hr2_0 = ddply(subset(hr, left == 1), c("sales"), 
+              summarise,
+              MEAN = mean(satisfaction_level),
+              N = length(satisfaction_level))
+
+hr2_d = hr %>% 
+  subset(left == 1) %>% 
+  group_by(sales) %>% 
+  dplyr::summarise(MEAN = mean(satisfaction_level),
+                   N = length(satisfaction_level))
+
+head(hr2_d, 3)
+
+# 새로운 변수를 추가하고 싶은 경우
+# mutate() : DF에 새로운 컬럼을 만드는 함수
+hr3_d = hr2_d %>% 
+  mutate(percent = MEAN / N)
+
+head(hr3_d, 3)
+
+# dplyr 와 ggplot2 조합
+library(ggplot2)
+
+hr2_d %>% 
+  ggplot() +
+  geom_bar(aes(x=sales, y=MEAN , fill=sales), stat="identity") +
+  geom_text(aes(x=sales, y=MEAN + 0.05,
+                label=round(MEAN, 2) * 100)) +
+  theme_bw() +
+  xlab("부서") + ylab("평균 만족도") + guides(fill = FALSE) +
+  theme(axis.text.x = element_text(angle= 45, size=8.5, color="blue",
+                                   face="plain", vjust = 1, hjust = 1))
+
+
+### A4. 중복데이터 제거하기 및 데이터 프레임 정렬
+
+# 1차원 벡터, 리스트에서의 중복 제거
+a = rep(1:10, each = 2)
+print(a)
+
+# 중복제거
+unique(a)
+
+# DF에서 중복제거
+OBS = rep(1:10)
+NAME = c("A", "A", "B", "A", "C", "C", "D", "D", "E", "E")
+ID = c("A10153", "A10153", "B15432", "A15853", "C54652", 
+       "C54652", "D14568", "D17865", "E13254", "E13254")
+DATE = c("20181130", "20181130", "20181130", "20181129", "20181128", 
+         "20181127", "20181128", "20181127", "20181126", "20181125")
+BTW = c(1,3,4,5,5,6,7,3,2,3)
+FFM = c(7000, 6353, 9123, 5423, 8235,
+        7345, 5234, 9453, 8453, 5535)
+
+dup = data.frame(OBS, NAME, ID, DATE, BTW, FFM)
+
+# obs : 번호
+# btw : Body TOtal Water
+
+# 전체 중복 제거
+# 하나라도 중복되면 전부 지워버림. 추천되지 않음
+dup1 = dup[-which(duplicated(dup)),]
+head(dup1, 3)
+
+# 변수 한 개를 기준으로 중복 제거
+# NAME 이 같은 변수들 중복 제거
+dup2 = dup[-which(duplicated(dup$NAME)), ]
+head(dup2, 6)
+
+# 다 변수를 기준으로 중복제거
+# NAME, ID 두 개의 값이 같은 중복 제거
+dup3 = dup[!duplicated(dup[, c("NAME", "ID")]), ]
+head(dup3, 10)
+
