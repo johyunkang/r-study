@@ -72,6 +72,8 @@ head(df3)
 
 
 ## dplyr 패키지 소개
+# install.packages("dplyr")
+library(dplyr)
 head(rowMeans(hr[, 1:2]))
 
 # 위 head(rowMeans(hr[, 1:2])) 를 dplyr 을 이용하여 아래 표현
@@ -85,7 +87,6 @@ apply(hr[, 1:5], 2, mean)
 
 hr[, 1:5] %>% 
   colMeans()
-
 
 
 # 데이터 집계 내기
@@ -171,8 +172,63 @@ head(dup1, 3)
 dup2 = dup[-which(duplicated(dup$NAME)), ]
 head(dup2, 6)
 
-# 다 변수를 기준으로 중복제거
+# 멀티 변수를 기준으로 중복제거
 # NAME, ID 두 개의 값이 같은 중복 제거
 dup3 = dup[!duplicated(dup[, c("NAME", "ID")]), ]
 head(dup3, 10)
 
+# 변수 인덱스로 제거
+dup4 = dup[!duplicated(dup[, c(2,3)]), ]
+head(dup4, 10)
+
+# 중복데이터 삭제는 제일 처음 데이터를 남김
+# 최신데이터를 남기기 위해서는 역순으로 정렬 후 중복제거 작업 진행
+
+# 데이터 정렬
+# 날짜 변수 설정
+dup$DATE = as.Date(dup$DATE, "%Y%m%d")
+summary(dup$DATE)
+
+dup_sort = dup[order(dup[, 'DATE'], decreasing = TRUE), ] # decreasing=TRUE (내림차순)
+
+
+# RESHAPE 
+# install.packages("reshape")
+library(reshape)
+
+OBS = rep(1:10)
+NAME = c("A", "A", "B", "A", "C", "C", "D", "D", "E", "E")
+ID = c("A10153", "A10153", "B15432", "A15853", "C54652", 
+       "C54652", "D14568", "D17865", "E13254", "E13254")
+DATE = c("20181130", "20181130", "20181130", "20181129", "20181128", 
+         "20181127", "20181128", "20181127", "20181126", "20181125")
+TEST = c("T1", "T1", "T1", "T2", "T2", "T2", "T3", "T3", "T4", "T4")
+VALUE = c(5, 2, 2, 4, 4, 4, 2, 3, 3, 0)
+
+RESHAPE = data.frame(OBS, NAME, ID, DATE, TEST, VALUE)
+
+# cast() : PYTHON의 원핫인코딩이랑 비슷
+cast_data = cast(RESHAPE, OBS + NAME + ID + DATE ~ TEST) # Wide Form
+
+# melt() : cast() 한 것을 원래대로 되돌릴 때 사용
+MELT_DATA = melt(cast_data, id=c("OBS", "NAME", "ID", "DATE")) 
+MELT_DATA2 = na.omit(MELT_DATA)
+
+# cast data : 그래프 시각화할 때의 데이터 구조로 적합
+# melt data : 모델링 할 때의 데이터 구조로 적합
+
+
+# data 병합 (merge)
+
+dup3 = dup[!duplicated(dup[, c("NAME", "ID")]), ]
+
+# 데이터 병합
+# all.x = TRUE : 레프트 아우터 조인
+# all.y = TRUE : 라이트 아우터 조인
+# all = TRUE : 아우터 조인
+# all = FALSE : 이너 조인
+head(dup3, 10)
+head(cast_data, 10)
+
+merge_df = merge(dup3, cast_data[, c(-1, -2, -4)], by = "ID", all.x = TRUE)
+head(merge_df, 10)
