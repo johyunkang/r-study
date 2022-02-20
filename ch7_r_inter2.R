@@ -132,6 +132,50 @@ head(sample_n_grp)
 
 
 ### A5. 정해진 index 에 따라 데이터 추출하기
+# slice(), top_n() 명령어 사용
+# slice() : index를 직접 설정해서 추출가능. Dataset은 ungroup() 되어 있는 데이터여야 함
+
+slice_data = ungrp_data %>% 
+  slice(1:5)
+
+head(slice_data, 10)
+
+head(grp_data, 10)
+
+slice_data2 = grp_data %>% 
+  slice(1:5)
+
+head(slice_data2, 10)
+# sliece 잘 안되는데?
+
+# top_n() : 설정해준 변수를 기준으로 가장 값이 높은 n개의 데이터를 가져옴.
+topn_data = ungrp_data %>% 
+  top_n(5, Mean) # Mean 값 중 값이 가장 높은 5개 추출
+
+head(topn_data, 10)
+
+### A6. 데이터 정렬하기
+# arrange() : ungroup 데이터만 정렬 가능. grouping 되어 있는 데이터는 Year 별로 정렬
+
+# ascending
+asc_data = ungrp_data %>% 
+  arrange(Mean) # Mean 기준으로 정렬
+
+head(asc_data, 10)
+
+# descending
+desc_data = ungrp_data %>% 
+  arrange(-Mean) # Mean 에 - (마이너스) 또는 desc()  붙이면 descending
+
+desc_data2 = ungrp_data %>% arrange(desc(Mean))
+
+head(desc_data, 10)
+head(desc_data2, 10)
+
+# 여러 변수 정렬
+desc_data3 = ungrp_data %>%  arrange(desc(Year), desc(Mean))
+
+head(desc_data3, 10)
 
 
 
