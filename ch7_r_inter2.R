@@ -218,3 +218,20 @@ mut_data = stock %>%
   select(Date, High, Low, Divided)
 
 head(mut_data)
+
+# mutate_if 
+# integer 를 모두 numeric으로 변경
+mut_if_data <- stock %>% 
+  mutate_if(is.integer, as.numeric)
+
+summary(mut_if_data)
+str(mut_if_data)
+str(stock)
+
+# mutate_at() : 지정한 변수들에 대해 계산식을 적용시키는 명령어
+# Date, Year, Day를 제외한 모든 변수를 log 변환
+mut_at_data <- stock %>% 
+  mutate_at(vars(-Date, -Year, -Day), log) %>% 
+  select_if(is.numeric)
+
+head(mut_at_data)
