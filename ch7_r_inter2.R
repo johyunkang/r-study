@@ -179,4 +179,42 @@ head(desc_data3, 10)
 
 
 
-## 
+### A7. 원하는 변수만 뽑아내기
+# select(), select_if()
+
+# index 활용
+select_data = grp_data %>% 
+  select(1:2)
+
+head(grp_data, 10)
+head(select_data, 10)
+
+# column 활용
+sel_data = grp_data %>% 
+  select(Year, Mean, Counts)
+
+head(sel_data, 10)
+
+
+# select_if : 조건을 통해 데이터 추출 가능.
+# factor 변수만 뽑기
+sel_if_data = grp_data %>% 
+  select_if(is.factor)
+
+head(sel_if_data, 5)
+
+# integer 만 뽑기
+sel_if_data2 = grp_data %>% 
+  select_if(is.integer)
+head(sel_if_data2)
+
+
+### A8. 새로운 변수 만들기 혹은 한번에 처리하기
+# mutate(), mutate_if(), mutate_at()
+head(stock)
+
+mut_data = stock %>% 
+  mutate(Divided = round(High/Low, 2)) %>% 
+  select(Date, High, Low, Divided)
+
+head(mut_data)
