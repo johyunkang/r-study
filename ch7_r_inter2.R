@@ -235,3 +235,5 @@ mut_at_data <- stock %>%
   select_if(is.numeric)
 
 head(mut_at_data)
+
+###
